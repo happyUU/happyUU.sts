@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- 数据源、mapper.xml映射文件 -->
+	
+	
+	<!-- 加载db.properties文件 -->
+	<bean id="config" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<property name="locations">
+			<array>
+				<value>classpath:db.properties</value>
+			</array>
+		</property>
+	
+	</bean>
+	
+	<!-- 配置数据库信息（替代mybatis的配置文件conf.xml） -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver}"></property>
+		<property name="url" value="${url}"></property>
+		<property name="username" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="maxActive" value="${maxActive}"></property>
+		<property name="maxIdle" value="${maxIdle}"></property>
+	</bean>
+	
+	
+	<!-- 将service注入给controller -->
+	<!-- <bean id="studentController" class="org.cn.controller.StudentController">
+		<property name="studentService" ref="studentService"></property>
+	</bean> -->
+	
+	<!-- 将dao层mapper注入给service层 -->
+	<bean id="studentService" class="org.cn.service.impl.StudentServiceImpl">
+		<property name="studentMapper" ref="studentMapper"></property>
+	</bean>
+	
+	<!-- 将SqlSessionFactory注入给dao层 -->
+	<!-- Spring整合MyBatis：将MyBatis的SqlSessionFactory交给Spring -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+		<!-- 指定批量产生哪个包中的mapper对象 -->
+		<property name="basePackage" value="org.cn.mapper"></property>
+	</bean>
+	
+	
+
+	<!-- 在SpringIOC容器中 创建MyBatis的核心类SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 加载mapper.xml路径 -->
+		<property name="mapperLocations" value="classpath:org/cn/mapper/*.xml"></property>
+	
+	</bean>
+	
+	
+
+</beans>
